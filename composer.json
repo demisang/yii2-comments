@@ -1,0 +1,29 @@
+{
+    "name": "demi/comments",
+    "description": "Yii2 module for comments management",
+    "keywords": ["yii2", "comment", "comments", "module", "widget", "management"],
+    "homepage": "https://github.com/demisang/yii2-comments#readme",
+    "type": "yii2-extension",
+    "license": "GNU",
+    "authors": [
+        {
+            "name": "Ivan Orlov",
+            "email": "orlov_mail@mail.ru",
+            "homepage": "https://orlov.io/",
+            "role": "Creator"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/demisang/yii2-comments/issues",
+        "source": "https://github.com/demisang/yii2-comments"
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "demi\\comments\\": ""
+        }
+    }
+}
