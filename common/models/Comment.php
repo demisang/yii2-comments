@@ -39,10 +39,12 @@ use yii\db\Expression;
  * @property string $fDate
  * @property bool $isAnonymous
  * others
- * @property \demi\comments\common\components\Comment|null $component
+ * @property \demi\comments\common\components\Comment $component
  */
 class Comment extends ActiveRecord
 {
+    public $captcha;
+
     /**
      * @inheritdoc
      */
@@ -57,9 +59,9 @@ class Comment extends ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['default'] = ['text', 'user_name', 'user_email', 'parent_id'];
+        $scenarios['default'] = ['material_type', 'material_id', 'text', 'user_name', 'user_email', 'parent_id'];
         $scenarios['admin'] = array_merge($scenarios['default'], [
-            'material_type', 'material_id', 'user_id', 'user_ip', 'language_id', 'is_approved', 'is_deleted',
+            'user_id', 'user_ip', 'language_id', 'is_approved', 'is_deleted',
             'created_at', 'updated_at',
         ]);
 
@@ -83,11 +85,18 @@ class Comment extends ActiveRecord
             // string max
             [['user_name', 'user_email'], 'string', 'max' => 255],
             // email
-            [['user_email'], 'email', 'allowEmpty' => true],
+            [['user_email'], 'email'],
             // default
             [['is_replied', 'is_approved', 'is_deleted'], 'default', 'value' => 0],
             [['user_id'], 'default', 'value' => Yii::$app->has('user') ? Yii::$app->user->id : null],
-            [['user_ip'], 'default', 'value' => new Expression('INET_ATON(:userIP)', [':userIP' => Yii::$app->request->userIP])],
+            [
+                ['user_ip'], 'default', 'value' => new Expression('INET_ATON(:userIP)',
+                [':userIP' => Yii::$app->request->userIP])
+            ],
+            // captcha
+            [['captcha'], '\yii\captcha\CaptchaValidator'],
+            // unsafe
+            [['material_type', 'material_id'], 'unsafe', 'on' => 'update'],
         ];
     }
 
@@ -100,10 +109,10 @@ class Comment extends ActiveRecord
             'id' => 'ID',
             'material_type' => 'Material Type',
             'material_id' => 'Material ID',
-            'text' => 'Text',
+            'text' => 'Comment',
             'user_id' => 'User ID',
-            'user_name' => 'User Name',
-            'user_email' => 'User Email',
+            'user_name' => 'Name',
+            'user_email' => 'Email',
             'user_ip' => 'User IP',
             'parent_id' => 'Parent ID',
             'language_id' => 'Language ID',
@@ -199,9 +208,31 @@ class Comment extends ActiveRecord
      */
     public function afterSave($insert, $changedAttributes)
     {
-        // something...
+        if (!empty($this->parent_id)) {
+            // Set "is_replied"=1 for parent comment
+            $this->updateAll(['is_replied' => 1], ['id' => $this->parent_id]);
+        }
 
         parent::afterSave($insert, $changedAttributes);
+    }
+
+    public function afterDelete()
+    {
+        // If have at least one child comment
+        if ($this->is_replied) {
+            // Delete child comments
+            $childs = $this->findAll(['parent_id' => $this->id]);
+            foreach ($childs as $child) {
+                $child->delete();
+            }
+        }
+
+        if (!empty($this->parent_id)) {
+            // Set "is_replied"=0 for parent comment
+            $this->updateAll(['is_replied' => 0], ['id' => $this->parent_id]);
+        }
+
+        parent::afterDelete();
     }
 
     /**
@@ -226,13 +257,9 @@ class Comment extends ActiveRecord
      * @throws \yii\base\Exception
      * @return \demi\comments\common\components\Comment|null
      */
-    public static function getComponent($name = 'comment')
+    public function getComponent($name = 'comment')
     {
-        if (Yii::$app->has($name)) {
-            return Yii::$app->get($name);
-        }
-
-        throw new Exception('Component "' . $name . '" was not found');
+        return Yii::$app->get($name);
     }
 
     /**
@@ -293,6 +320,30 @@ class Comment extends ActiveRecord
         $func = static::getComponent()->getCommentDate;
 
         return is_callable($func) ? call_user_func($func, $this) : Yii::$app->formatter->asDate($this->created_at);
+    }
+
+    /**
+     * Checks that the current user can update this comment
+     *
+     * @return bool
+     */
+    public function canUpdate()
+    {
+        $func = static::getComponent()->canUpdate;
+
+        return is_callable($func) ? call_user_func($func, $this) : $func;
+    }
+
+    /**
+     * Checks that the current user can delete this comment
+     *
+     * @return bool
+     */
+    public function canDelete()
+    {
+        $func = static::getComponent()->canDelete;
+
+        return is_callable($func) ? call_user_func($func, $this) : $func;
     }
 
     /**

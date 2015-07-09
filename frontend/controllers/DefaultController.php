@@ -5,11 +5,35 @@ namespace demi\comments\frontend\controllers;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
-use demi\comments\common\models\Comment;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use demi\comments\common\models\Comment;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
 
+/**
+ * Class DefaultController
+ *
+ * @property \demi\comments\common\components\Comment $component
+ */
 class DefaultController extends Controller
 {
+    public $itemViewFile = '@vendor/demi/comments/frontend/widgets/views/_comment';
+    public $commentComponentName = 'comment';
+
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return [
+            'captcha' => [
+                'class' => 'yii\captcha\CaptchaAction',
+                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+            ],
+        ];
+    }
+
     public function behaviors()
     {
         return [
@@ -23,53 +47,57 @@ class DefaultController extends Controller
     }
 
     /**
-     * Lists all Comment in the material
-     *
-     * @param int $type Material type
-     * @param int $id   Material id
-     *
-     * @return mixed
-     */
-    public function actionIndex($type, $id)
-    {
-        $models = Comment::find()->where(['material_type' => $type, 'material_id' => $id]);
-
-        return $this->render('index', [
-            'models' => $models,
-        ]);
-    }
-
-    /**
-     * Creates a new Comment
+     * Create new [[Comment]]
      *
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Comment();
+        $request = Yii::$app->request;
+        $model = $this->component->model;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+        if ($model->load(Yii::$app->request->post())) {
+            if ($request->post('ajax')) {
+                // Form ajax validation
+                Yii::$app->response->format = Response::FORMAT_JSON;
+
+                return ActiveForm::validate($model);
+            }
+
+            if ($model->save()) {
+                // Refresh model data
+                $model->refresh();
+                return $this->renderAjax($this->itemViewFile, ['comment' => $model]);
+            }
         }
+
+        return '';
     }
 
     /**
-     * Updates an existing Comment
+     * Update existing [[Comment]]
      *
      * @param int $id
      *
      * @return mixed
+     *
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
+        if (!$model->canUpdate()) {
+            throw new ForbiddenHttpException('You are not allowed to perform this action');
+        }
+
+        if (Yii::$app->request->isGet) {
+            return $model->text;
+        }
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->renderAjax($this->itemViewFile, ['comment' => $model]);
         } else {
             return $this->render('update', [
                 'model' => $model,
@@ -78,21 +106,34 @@ class DefaultController extends Controller
     }
 
     /**
-     * Deletes an existing Comment.
+     * Delete existing [[Comment]]
      *
      * @param int $id
      *
-     * @return mixed
+     * @return array
+     *
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
 
-        return $this->redirect(['index']);
+        if (!$model->canDelete()) {
+            throw new ForbiddenHttpException('You are not allowed to perform this action');
+        }
+
+        $status = (bool)$model->delete();
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return [
+            'status' => $status,
+        ];
     }
 
     /**
-     * Finds the Comment model based on its primary key value.
+     * Finds the [[Comment]] model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
      * @param string $id
@@ -102,10 +143,28 @@ class DefaultController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Comment::findOne($id)) !== null) {
+        $model = $this->component->model;
+        if (($model = $model->findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * Get comments component
+     *
+     * @param string|null $name
+     *
+     * @return \demi\comments\common\components\Comment
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getComponent($name = null)
+    {
+        if ($name === null) {
+            $name = $this->commentComponentName;
+        }
+
+        return Yii::$app->get($name);
     }
 }

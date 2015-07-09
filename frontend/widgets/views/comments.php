@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\Html;
 use yii\web\View;
 use demi\comments\common\models\Comment;
 use demi\comments\frontend\widgets\Comments;
@@ -8,10 +9,15 @@ use demi\comments\frontend\widgets\Comments;
 /* @var $widget Comments */
 /* @var $comments Comment[] */
 /* @var $parentId int|null */
+/* @var $nestedLevel int */
 
 $comments = $widget->comments;
 $hasComments = false; // Check that $comments has contain at least one comment with parent_id==$patentId
-$content[] = '<ul>';
+$ulOptions = $parentId ? $widget->nestedOptions : $widget->options;
+
+if ($nestedLevel <= $widget->maxNestedLevel) {
+    $content[] = Html::beginTag('ul', $ulOptions);
+}
 
 foreach ($comments as $comment) {
     if ($comment->parent_id != $parentId) {
@@ -25,16 +31,14 @@ foreach ($comments as $comment) {
     $content[] = "\t<li>";
 
     // Render comment data
-    $content[] = "\t\t" . $this->render('_comment', [
-            'widget' => $widget,
-            'comment' => $comment,
-        ]);
+    $content[] = "\t\t" . $this->render('_comment', ['comment' => $comment]);
 
     // Recursive render sub-comments
     $subComments = $this->render('comments', [
         'widget' => $widget,
         'comments' => $comments,
         'parentId' => $comment->id,
+        'nestedLevel' => $nestedLevel + 1,
     ]);
     if (!empty($subComments)) {
         $content[] = $subComments;
@@ -43,8 +47,10 @@ foreach ($comments as $comment) {
     $content[] = "\t</li>";
 }
 
-$content[] = '</ul>';
+if ($nestedLevel <= $widget->maxNestedLevel) {
+    $content[] = Html::endTag('ul');
+}
 
-if ($hasComments) {
+if ($hasComments || $nestedLevel === 1) {
     echo implode("\n", $content);
 }
