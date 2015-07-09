@@ -3,6 +3,7 @@
 namespace demi\comments\frontend\controllers;
 
 use Yii;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\web\ForbiddenHttpException;
@@ -67,6 +68,7 @@ class DefaultController extends Controller
             if ($model->save()) {
                 // Refresh model data
                 $model->refresh();
+
                 return $this->renderAjax($this->itemViewFile, ['comment' => $model]);
             }
         }
@@ -81,6 +83,7 @@ class DefaultController extends Controller
      *
      * @return mixed
      *
+     * @throws BadRequestHttpException
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      */
@@ -92,17 +95,30 @@ class DefaultController extends Controller
             throw new ForbiddenHttpException('You are not allowed to perform this action');
         }
 
+        // Rerutn plain comment text
         if (Yii::$app->request->isGet) {
+            if (!Yii::$app->request->isAjax) {
+                throw new BadRequestHttpException('You should not open this link directly');
+            }
+
             return $model->text;
         }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->renderAjax($this->itemViewFile, ['comment' => $model]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+        // Try to save and return JSON with "status" and "text"
+        $text = Yii::$app->request->post('text');
+        $model->setAttributes(['text' => $text]);
+
+        $response = [
+            'status' => $model->save(),
+        ];
+
+        if ($response['status']) {
+            $response['text'] = $model->getPreparedText();
         }
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return $response;
     }
 
     /**

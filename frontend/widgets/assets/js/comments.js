@@ -28,7 +28,7 @@
                 $.ajax({
                     method: "POST",
                     url: link.attr("href"),
-                    dataType: "json",
+                    dataType: "JSON",
                     success: function () {
                         // Remove comment item (with all child comments)
                         link.closest("li").remove();
@@ -37,6 +37,13 @@
             }
         });
 
+        // Update comment
+        $(widget).on("click", opts.updateButtonSelector, {
+            options: opts,
+            widget: widget
+        }, opts.updateComment);
+
+        // Create new comment form submit
         $(widget.find(opts.formBoxSelector + " form")).on("beforeSubmit", {
             options: opts,
             widget: widget
@@ -48,6 +55,8 @@
     $.fn.commentsWidget.defaults = {
         maxNestedLevel: 6,
         deleteComfirmText: "Are you sure you want to delete this comment?",
+        updateButtonText: "Update",
+        cancelUpdateButtonText: "Cancel",
         // Selectors
         itemSelector: ".comment",
         commentTextSelector: ".comment-text > p",
@@ -121,6 +130,76 @@
 
             // Insert new comment
             parentObject.find("ul:first").append(newCommentItem);
+        },
+        updateComment: function (event) {
+            event.preventDefault();
+            var link = $(this);
+            var widget = event.data.widget;
+            var widgetOptions = event.data.options;
+
+            // Restore form position (it is not necessary, but it more beautiful)
+            widgetOptions.restoreCommentForm.call(widgetOptions, widget);
+
+            $.ajax({
+                method: "GET",
+                url: link.attr("href"),
+                dataType: "HTML",
+                success: function (commentText) {
+                    var item = link.closest(widgetOptions.itemSelector);
+
+                    // Create new form for comment update
+                    var textarea = $("<textarea/>", {name: "text", class: "col-md-12 form-control"}).text(commentText);
+
+                    // Create new form tag
+                    var updateForm = $("<form/>", {
+                        class: "update-comment-form form-group",
+                        method: "POST",
+                        action: link.attr("href")
+                    });
+                    // Set form submit event
+                    updateForm.on("submit", function (e) {
+                        e.preventDefault();
+
+                        $.ajax({
+                            method: "POST",
+                            url: link.attr("href"),
+                            data: updateForm.serialize(),
+                            dataType: "JSON",
+                            success: function (data) {
+                                if (data.status && data.text) {
+                                    item.find(widgetOptions.commentTextSelector).html(data.text);
+                                    updateForm.remove();
+                                } else {
+                                    item.find(".update-comment-form").addClass("has-error");
+                                }
+                            }
+                        });
+                    });
+
+                    var submitButton = $("<button/>", {
+                        type: "submit",
+                        class: "btn btn-xs btn-success"
+                    }).text(widgetOptions.updateButtonText);
+
+                    var cancelButton = $("<button/>", {
+                        type: "submit",
+                        class: "btn btn-xs btn-warning"
+                    }).text(widgetOptions.cancelUpdateButtonText);
+                    cancelButton.on("click", function (e) {
+                        e.preventDefault();
+                        updateForm.remove();
+                    });
+
+                    updateForm.html(textarea).append(
+                        $("<div/>", {class: "btn-group"}).append(submitButton).append(cancelButton)
+                    );
+
+                    // Remove old textarea
+                    item.find(".update-comment-form").remove();
+                    // Insert textarea after comment text block
+                    item.find(widgetOptions.commentTextSelector).after(updateForm);
+                }
+            });
         },
         restoreCommentForm: function (widget) {
             widget.find(this.restoreFormSelector).trigger("click");

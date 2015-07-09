@@ -59,7 +59,7 @@ class Comment extends ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['default'] = ['material_type', 'material_id', 'text', 'user_name', 'user_email', 'parent_id'];
+        $scenarios['default'] = ['material_type', 'material_id', 'text', 'user_name', 'user_email', 'parent_id', 'captcha'];
         $scenarios['admin'] = array_merge($scenarios['default'], [
             'user_id', 'user_ip', 'language_id', 'is_approved', 'is_deleted',
             'created_at', 'updated_at',
@@ -94,9 +94,7 @@ class Comment extends ActiveRecord
                 [':userIP' => Yii::$app->request->userIP])
             ],
             // captcha
-            [['captcha'], '\yii\captcha\CaptchaValidator'],
-            // unsafe
-            [['material_type', 'material_id'], 'unsafe', 'on' => 'update'],
+//            [['captcha'], 'yii\captcha\CaptchaValidator'],
         ];
     }
 

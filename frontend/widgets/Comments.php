@@ -148,8 +148,10 @@ class Comments extends Widget
 
         $id = $this->id;
 
-        $options = Json::encode($this->clientOptions);
+        $options = $this->clientOptions;
         $options['maxNestedLevel'] = $this->maxNestedLevel;
+
+        $options = Json::encode($options);
 
         // Register plugin
         $view->registerJs("jQuery('#$id').commentsWidget($options);");
