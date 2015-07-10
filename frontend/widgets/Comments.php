@@ -67,7 +67,7 @@ class Comments extends Widget
      */
     public function run()
     {
-        $comments = $this->render('comments', [
+        $comments = $this->render($this->component->listView, [
             'widget' => $this,
             'comments' => $this->comments,
             'parentId' => null, // Render first comments level
@@ -78,7 +78,7 @@ class Comments extends Widget
         $model->material_type = $this->materialType;
         $model->material_id = $this->materialId;
 
-        $form = $this->render('form', [
+        $form = $this->render($this->component->formView, [
             'widget' => $this,
             'comments' => $this->comments,
             'model' => $model,

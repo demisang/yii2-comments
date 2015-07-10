@@ -31,10 +31,10 @@ foreach ($comments as $comment) {
     $content[] = "\t<li>";
 
     // Render comment data
-    $content[] = "\t\t" . $this->render('_comment', ['comment' => $comment]);
+    $content[] = "\t\t" . $this->render($widget->component->itemView, ['comment' => $comment]);
 
     // Recursive render sub-comments
-    $subComments = $this->render('comments', [
+    $subComments = $this->render($widget->component->listView, [
         'widget' => $widget,
         'comments' => $comments,
         'parentId' => $comment->id,
