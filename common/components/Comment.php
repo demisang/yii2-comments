@@ -37,8 +37,8 @@ class Comment extends Component
      *
      * You can set callable-function such as:
      *
-     * function($materialType, $materialId, $comment) {
-     *     return \Yii::$app->user->id == $comment->user_id;
+     * function($comment) {
+     *     return !$comment->isAnonymous && \Yii::$app->user->id == $comment->user_id;
      * }
      *
      * @var bool|callable
