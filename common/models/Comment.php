@@ -76,6 +76,12 @@ class Comment extends ActiveRecord
         return [
             // required
             [['material_type', 'material_id', 'text'], 'required'],
+            [
+                ['captcha', 'user_name', 'user_email'], 'required',
+                'when' => function ($model) {
+                    return Yii::$app->user->isGuest;
+                }
+            ],
             // integer
             [['material_type', 'material_id', 'user_id', 'parent_id', 'language_id'], 'integer'],
             // boolean
@@ -94,7 +100,13 @@ class Comment extends ActiveRecord
                 [':userIP' => Yii::$app->request->userIP])
             ],
             // captcha
-            // [['captcha'], 'captcha', 'captchaAction' => '/comment/default/captcha'],
+            [
+                ['captcha'], 'demi\recaptcha\ReCaptchaValidator', 'secretKey' => Yii::$app->params['reCAPTCHA.secretKey'],
+                'when' => function ($model) {
+                    /** @var $model self */
+                    return !$model->hasErrors() && Yii::$app->user->isGuest;
+                }
+            ],
         ];
     }
 
@@ -173,14 +185,7 @@ class Comment extends ActiveRecord
             $this->user_id = Yii::$app->has('user') ? Yii::$app->user->id : null;
         }
 
-        if (empty($this->user_id)) {
-            if (empty($this->user_name)) {
-                $this->addError('user_name', 'You must set you name');
-            }
-            if (empty($this->user_email)) {
-                $this->addError('user_email', 'You must set you email');
-            }
-        } else {
+        if (!empty($this->user_id)) {
             $this->user_name = $this->user_email = null;
         }
 
@@ -192,10 +197,7 @@ class Comment extends ActiveRecord
      */
     public function afterValidate()
     {
-        if (!$this->hasErrors()) {
-            // Validate the captcha
-
-        }
+        // some...
 
         parent::afterValidate();
     }

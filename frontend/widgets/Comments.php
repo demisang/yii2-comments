@@ -47,7 +47,7 @@ class Comments extends Widget
     /** @var array [[ActiveForm]] configuration */
     public $formConfig = [
         'enableClientValidation' => true,
-        // 'enableAjaxValidation' => true,
+        'enableAjaxValidation' => false,
     ];
 
     public function init()

@@ -1,7 +1,6 @@
 <?php
 
 use demi\comments\frontend\widgets\Comments;
-use yii\captcha\Captcha;
 use yii\helpers\Html;
 use yii\web\View;
 use yii\widgets\ActiveForm;
@@ -25,16 +24,16 @@ use yii\widgets\ActiveForm;
 
     <?php if (Yii::$app->user->isGuest): ?>
     <div class="row">
-        <?= $form->field($model, 'user_name', ['options' => ['class' => 'col-md-6'], 'enableAjaxValidation' => true])
+        <?= $form->field($model, 'user_name', ['options' => ['class' => 'col-md-6']])
             ->textInput(['maxlength' => true]) ?>
 
-        <?= $form->field($model, 'user_email', ['options' => ['class' => 'col-md-6'], 'enableAjaxValidation' => true])
+        <?= $form->field($model, 'user_email', ['options' => ['class' => 'col-md-6']])
             ->input('email', ['maxlength' => true]) ?>
     </div>
     <?php endif ?>
 
     <div class="row">
-        <?= $form->field($model, 'text', ['options' => ['class' => 'col-md-12'], 'enableAjaxValidation' => true])
+        <?= $form->field($model, 'text', ['options' => ['class' => 'col-md-12']])
             ->textarea(['rows' => 4, 'maxlength' => true]) ?>
     </div>
 
@@ -44,11 +43,12 @@ use yii\widgets\ActiveForm;
             <?php if (Yii::$app->user->isGuest): ?>
             <?php endif ?>
         </div>
-        <?= $form->field($model, 'captcha', ['options' => ['class' => 'col-md-6'], 'enableAjaxValidation' => true])
-                ->widget(Captcha::className(), [
-                    'captchaAction' => '/comment/default/captcha',
-                    'options' => ['class' => 'form-control', 'autocomplete' => 'off'],
-                ]) ?>
+        <div class="col-md-6">
+            <div class="pull-right">
+            <?= $form->field($model, 'captcha', ['enableAjaxValidation' => false])->label(false)
+                    ->widget('demi\recaptcha\ReCaptcha', ['siteKey' => $widget->component->reCaptchaSiteKey]) ?>
+            </div>
+        </div>
     </div>
 
     <?php ActiveForm::end(); ?>

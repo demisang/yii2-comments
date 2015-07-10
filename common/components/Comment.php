@@ -87,6 +87,20 @@ class Comment extends Component
     public $itemView = '@vendor/demi/comments/frontend/widgets/views/_comment';
     /** @var string Path to view file for render new comment form */
     public $formView = '@vendor/demi/comments/frontend/widgets/views/form';
+    /**
+     * reCAPTCHA API public key
+     * Follow this link https://www.google.com/recaptcha/admin to get your API keys
+     *
+     * @var string|callable
+     */
+    public $reCaptchaSiteKey;
+    /**
+     * reCAPTCHA API secret key
+     * Follow this link https://www.google.com/recaptcha/admin to get your API keys
+     *
+     * @var string|callable
+     */
+    public $reCaptchaSecretKey;
 
     public function init()
     {
@@ -94,6 +108,14 @@ class Comment extends Component
 
         if (!is_array($this->types)) {
             throw new Exception('You must specify $types for "comment" component');
+        }
+
+        // Call callable config params
+        $callableConfigKeys = ['reCaptchaSiteKey', 'reCaptchaSecretKey'];
+        foreach ($callableConfigKeys as $key) {
+            if (is_callable($this->$key)) {
+                $this->$key = call_user_func($this->$key);
+            }
         }
     }
 

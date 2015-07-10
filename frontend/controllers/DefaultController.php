@@ -54,26 +54,27 @@ class DefaultController extends Controller
      */
     public function actionCreate()
     {
-        $request = Yii::$app->request;
         $model = $this->component->model;
 
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $response = [
+            'result' => false,
+        ];
+
         if ($model->load(Yii::$app->request->post())) {
-            if ($request->post('ajax')) {
-                // Form ajax validation
-                Yii::$app->response->format = Response::FORMAT_JSON;
-
-                return ActiveForm::validate($model);
-            }
-
             if ($model->save()) {
                 // Refresh model data
                 $model->refresh();
 
-                return $this->renderAjax($this->component->itemView, ['comment' => $model]);
+                $response['result'] = true;
+                $response['comment'] = $this->renderAjax($this->component->itemView, ['comment' => $model]);
+            } else {
+                $response['result'] = false;
+                $response['errors'] = $model->firstErrors;
             }
         }
 
-        return '';
+        return $response;
     }
 
     /**

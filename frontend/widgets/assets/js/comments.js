@@ -90,14 +90,23 @@
                 method: "POST",
                 url: form.attr("action"),
                 data: form.serialize(),
-                dataType: "html",
-                success: function (html) {
-                    $(form).yiiActiveForm("resetForm");
-                    form[0].reset();
+                dataType: "JSON",
+                success: function (data) {
+                    if (data.result === true) {
+                        $(form).yiiActiveForm("resetForm");
+                        form[0].reset();
 
-                    // "html" contain new comment item
-                    // event.data.options - custom event param, contain all plugin options
-                    event.data.options.insertNewComment.call(widgetOptions, $(html), event.data.widget);
+                        // "data.comment" contain new comment item
+                        // event.data.options - custom event param, contain all plugin options
+                        event.data.options.insertNewComment.call(widgetOptions, $(data.comment), event.data.widget);
+                    } else {
+                        // crutch...
+                        $.each(data.errors, function(attr, message) {
+                            var fieldBlock = $(".field-comment-" + attr);
+                            fieldBlock.addClass("has-error");
+                            fieldBlock.find(".help-block").text(message);
+                        });
+                    }
                 }
             });
 
