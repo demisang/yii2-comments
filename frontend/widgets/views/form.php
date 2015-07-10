@@ -46,7 +46,8 @@ use yii\widgets\ActiveForm;
         </div>
         <?= $form->field($model, 'captcha', ['options' => ['class' => 'col-md-6'], 'enableAjaxValidation' => true])
                 ->widget(Captcha::className(), [
-                    'captchaAction' => ['/comment/default/captcha'],
+                    'captchaAction' => '/comment/default/captcha',
+                    'options' => ['class' => 'form-control', 'autocomplete' => 'off'],
                 ]) ?>
     </div>
 

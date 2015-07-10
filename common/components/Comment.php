@@ -81,6 +81,12 @@ class Comment extends Component
      * @var null|callable
      */
     public $getCommentDate;
+    /** @var string Path to view file for render comments list (<ul> and <li> tags + nested) */
+    public $listView = '@vendor/demi/comments/frontend/widgets/views/comments';
+    /** @var string Path to view file for render each comment item (inside the <li> tag) */
+    public $itemView = '@vendor/demi/comments/frontend/widgets/views/_comment';
+    /** @var string Path to view file for render new comment form */
+    public $formView = '@vendor/demi/comments/frontend/widgets/views/form';
 
     public function init()
     {

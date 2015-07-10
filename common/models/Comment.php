@@ -94,7 +94,7 @@ class Comment extends ActiveRecord
                 [':userIP' => Yii::$app->request->userIP])
             ],
             // captcha
-//            [['captcha'], 'yii\captcha\CaptchaValidator'],
+            // [['captcha'], 'captcha', 'captchaAction' => '/comment/default/captcha'],
         ];
     }
 
@@ -185,6 +185,19 @@ class Comment extends ActiveRecord
         }
 
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterValidate()
+    {
+        if (!$this->hasErrors()) {
+            // Validate the captcha
+
+        }
+
+        parent::afterValidate();
     }
 
     /**

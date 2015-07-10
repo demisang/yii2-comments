@@ -69,7 +69,7 @@ class DefaultController extends Controller
                 // Refresh model data
                 $model->refresh();
 
-                return $this->renderAjax($this->itemViewFile, ['comment' => $model]);
+                return $this->renderAjax($this->component->itemView, ['comment' => $model]);
             }
         }
 
