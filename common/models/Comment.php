@@ -79,7 +79,8 @@ class Comment extends ActiveRecord
             [
                 ['captcha', 'user_name', 'user_email'], 'required',
                 'when' => function ($model) {
-                    return Yii::$app->user->isGuest;
+                    /** @var $model self */
+                    return $model->isNewRecord && Yii::$app->user->isGuest;
                 }
             ],
             // integer
@@ -104,7 +105,7 @@ class Comment extends ActiveRecord
                 ['captcha'], 'demi\recaptcha\ReCaptchaValidator', 'secretKey' => Yii::$app->params['reCAPTCHA.secretKey'],
                 'when' => function ($model) {
                     /** @var $model self */
-                    return !$model->hasErrors() && Yii::$app->user->isGuest;
+                    return $model->isNewRecord && !$model->hasErrors() && Yii::$app->user->isGuest;
                 }
             ],
         ];

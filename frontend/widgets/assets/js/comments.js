@@ -101,7 +101,7 @@
                         event.data.options.insertNewComment.call(widgetOptions, $(data.comment), event.data.widget);
                     } else {
                         // crutch...
-                        $.each(data.errors, function(attr, message) {
+                        $.each(data.errors, function (attr, message) {
                             var fieldBlock = $(".field-comment-" + attr);
                             fieldBlock.addClass("has-error");
                             fieldBlock.find(".help-block").text(message);
