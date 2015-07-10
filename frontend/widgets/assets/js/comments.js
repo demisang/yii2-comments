@@ -57,6 +57,7 @@
         deleteComfirmText: "Are you sure you want to delete this comment?",
         updateButtonText: "Update",
         cancelUpdateButtonText: "Cancel",
+        nestedListOptions: {},
         // Selectors
         itemSelector: ".comment",
         commentTextSelector: ".comment-text > p",
@@ -128,7 +129,7 @@
             if (isReply) {
                 if (!parentCommentItem.find("ul:first").length) {
                     // Create new sub-comments section if not exists
-                    parentCommentItem.append($("<ul/>"));
+                    parentCommentItem.append($("<ul/>", this.nestedListOptions));
                 }
                 // Set parent comment object
                 parentObject = parentCommentItem;
