@@ -93,6 +93,8 @@ class Comment extends ActiveRecord
             [['user_name', 'user_email'], 'string', 'max' => 255],
             // email
             [['user_email'], 'email'],
+            // exists
+            [['parent_id'], 'exist', 'targetAttribute' => 'id'],
             // default
             [['is_replied', 'is_approved', 'is_deleted'], 'default', 'value' => 0],
             // captcha
@@ -205,11 +207,11 @@ class Comment extends ActiveRecord
 
             // Default user IP
             $this->user_ip = new Expression('INET_ATON(:userIP)', [':userIP' => Yii::$app->request->userIP]);
-        }
 
-        if (!empty($this->user_id)) {
-            // Clear name & email if user_id exists
-            $this->user_name = $this->user_email = null;
+            if (!empty($this->user_id)) {
+                // Clear name & email if user_id exists
+                $this->user_name = $this->user_email = null;
+            }
         }
 
         return true;

@@ -3,13 +3,13 @@
 namespace demi\comments\backend\controllers;
 
 use Yii;
+use yii\web\Response;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 use demi\comments\common\models\Comment;
 use demi\comments\backend\models\CommentSearch;
-use yii\web\Response;
 
 /**
  * ManageController implements the CRUD actions for Comment model.
@@ -83,10 +83,16 @@ class ManageController extends Controller
      * @param string $id
      *
      * @return mixed
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+
+        if (!$model->canUpdate()) {
+            throw new ForbiddenHttpException('You don\'t have permissions to update this comment');
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -104,10 +110,18 @@ class ManageController extends Controller
      * @param string $id
      *
      * @return mixed
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        if (!$model->canDelete()) {
+            throw new ForbiddenHttpException('You don\'t have permissions to delete this comment');
+        }
+
+        $model->delete();
 
         return $this->redirect(['index']);
     }
