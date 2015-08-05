@@ -95,11 +95,6 @@ class Comment extends ActiveRecord
             [['user_email'], 'email'],
             // default
             [['is_replied', 'is_approved', 'is_deleted'], 'default', 'value' => 0],
-            [['user_id'], 'default', 'value' => Yii::$app->has('user') ? Yii::$app->user->id : null],
-            [
-                ['user_ip'], 'default', 'value' => new Expression('INET_ATON(:userIP)',
-                [':userIP' => Yii::$app->request->userIP])
-            ],
             // captcha
             [
                 ['captcha'], 'demi\recaptcha\ReCaptchaValidator', 'secretKey' => Yii::$app->params['reCAPTCHA.secretKey'],
@@ -182,14 +177,6 @@ class Comment extends ActiveRecord
         $this->user_name = $normalize($this->user_name);
         $this->user_email = $normalize($this->user_email);
 
-        if ($this->isNewRecord) {
-            $this->user_id = Yii::$app->has('user') ? Yii::$app->user->id : null;
-        }
-
-        if (!empty($this->user_id)) {
-            $this->user_name = $this->user_email = null;
-        }
-
         return true;
     }
 
@@ -212,7 +199,18 @@ class Comment extends ActiveRecord
             return false;
         }
 
-        $this->user_ip = new Expression('INET_ATON(:userIP)', [':userIP' => Yii::$app->request->userIP]);
+        if ($insert) {
+            // Default user ID
+            $this->user_id = Yii::$app->has('user') ? Yii::$app->user->id : null;
+
+            // Default user IP
+            $this->user_ip = new Expression('INET_ATON(:userIP)', [':userIP' => Yii::$app->request->userIP]);
+        }
+
+        if (!empty($this->user_id)) {
+            // Clear name & email if user_id exists
+            $this->user_name = $this->user_email = null;
+        }
 
         return true;
     }

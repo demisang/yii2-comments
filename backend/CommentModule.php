@@ -2,6 +2,8 @@
 
 namespace demi\comments\backend;
 
+use Yii;
+use demi\comments\backend\assets\CommentsAsset;
 use demi\comments\common\components\BaseCommentModule;
 
 class CommentModule extends BaseCommentModule
@@ -25,6 +27,9 @@ class CommentModule extends BaseCommentModule
     public function init()
     {
         parent::init();
+
+        // Register JS & CSS helpful files
+        CommentsAsset::register(Yii::$app->view);
 
         // custom initialization code goes here
     }

@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 
     <div class="row">
         <?= $form->field($model, 'material_type', ['options' => ['class' => 'col-md-2']])
-            ->dropDownList(CommentHelper::getMaterialTypesList()) ?>
+            ->dropDownList(Yii::$app->comment->types) ?>
 
         <?= $form->field($model, 'material_id', ['options' => ['class' => 'col-md-2']])
             ->textInput(['maxlength' => true]) ?>

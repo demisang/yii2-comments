@@ -1,13 +1,13 @@
 <?php
 
-use common\helpers\CommentHelper;
-use common\helpers\LangHelper;
-use common\models\Comment;
 use yii\helpers\Html;
+use yii\widgets\Pjax;
 use yii\grid\GridView;
+use yii\helpers\StringHelper;
+use demi\comments\common\models\Comment;
 
 /* @var $this yii\web\View */
-/* @var $searchModel backend\modules\comment\models\CommentSearch */
+/* @var $searchModel demi\comments\backend\models\CommentSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Comments';
@@ -22,35 +22,76 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Comment', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
+    <?php Pjax::begin() ?>
     <?=
     GridView::widget([
+        'id' => 'comments-grid',
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'dataColumnClass' => 'demi\comments\backend\components\DataColumn',
         'columns' => [
             [
                 'attribute' => 'material_type',
-                'filter' => CommentHelper::getMaterialTypesList(),
+                // 'prepend' => '<span class="glyphicon glyphicon-th-list"></span>',
+                'filter' => Yii::$app->comment->types,
+                'filterOptions' => ['class' => 'col-md-1'],
                 'value' => function ($model) {
-                        /* @var $model Comment */
-                        return $model->material_type ? CommentHelper::getMaterialTypesList($model->material_type) : null;
-                    },
+                    /* @var $model Comment */
+                    $types = Yii::$app->comment->types;
+
+                    return isset($types[$model->material_type]) ? $types[$model->material_type] : null;
+                },
             ],
-            'material_id',
-            'text:ntext',
-            'user_id',
-            'user_name',
-            'user_email:email',
             [
-                'attribute' => 'language_id',
-                'filter' => LangHelper::getLanguages(),
-                'value' => function ($model) {
-                        /* @var $model Comment */
-                        return $model->language_id ? LangHelper::getLanguages($model->language_id) : null;
-                    },
+                'attribute' => 'material_id',
+                'filterInputOptions' => ['class' => 'form-control', 'id' => null],
+                'filterOptions' => ['class' => 'col-md-1'],
+                // 'prepend' => '<span class="glyphicon glyphicon-chevron-right"></span>',
             ],
-            'created_at',
-            ['class' => '\demi\helpers\grid\BigActionColumn'],
+            [
+                'attribute' => 'text',
+                'format' => 'raw',
+                'prepend' => '<span class="glyphicon glyphicon-comment form-control-feedback" aria-hidden="true"></span>',
+                'value' => function ($model) {
+                    /* @var $model Comment */
+                    $shortText = StringHelper::truncate(strip_tags($model->text), 160);
+
+                    return Html::encode($shortText);
+                },
+            ],
+            [
+                'attribute' => 'user_id',
+                'prepend' => '<span class="glyphicon glyphicon-user form-control-feedback" aria-hidden="true"></span>',
+                'format' => 'raw',
+                'label' => 'User',
+                'value' => function ($model) {
+                    /* @var $model Comment */
+                    $username = $model->getUsername();
+
+                    if ($model->isAnonymous) {
+                        return $username;
+                    }
+
+                    return Html::a($username, $model->getUserProfileUrl());
+                },
+            ],
+            [
+                'attribute' => 'user_email',
+                'format' => 'email',
+                'prepend' => '<span class="glyphicon glyphicon-envelope form-control-feedback" aria-hidden="true"></span>',
+
+            ],
+            [
+                'attribute' => 'created_at',
+                'format' => 'datetime',
+                'prepend' => '<span class="glyphicon glyphicon-calendar form-control-feedback" aria-hidden="true"></span>',
+            ],
+            [
+                'class' => 'demi\comments\backend\components\ActionColumn',
+                'filterAttribute' => 'is_approved',
+            ],
         ],
     ]); ?>
+    <?php Pjax::end() ?>
 
 </div>

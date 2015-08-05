@@ -18,8 +18,12 @@ class CommentSearch extends Comment
     public function rules()
     {
         return [
-            [['id', 'material_type', 'material_id', 'user_id', 'user_ip', 'parent_id', 'language_id', 'is_replied', 'is_approved', 'is_deleted'], 'integer'],
-            [['text', 'user_name', 'user_email', 'created_at', 'updated_at'], 'safe'],
+            // filter
+            [['user_id'], 'filter', 'filter' => 'trim'],
+            // integer
+            [['id', 'material_type', 'material_id', 'user_ip', 'parent_id', 'language_id', 'is_replied', 'is_approved', 'is_deleted'], 'integer'],
+            // safe
+            [['text', 'user_id', 'user_name', 'user_email', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -41,10 +45,11 @@ class CommentSearch extends Comment
      */
     public function search($params)
     {
-        $query = Comment::find();
+        $query = Comment::find()->with('user');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['created_at' => SORT_DESC]],
         ]);
 
         $this->load($params);
@@ -55,11 +60,25 @@ class CommentSearch extends Comment
             return $dataProvider;
         }
 
+        if (!empty($this->user_id)) {
+            $isUserId = preg_match('/^\d+$/', $this->user_id);
+
+            if ($isUserId) {
+                $query->andWhere(['user_id' => $this->user_id]);
+            } else {
+                // @todo Search by username. Need create config for this option
+                /*
+                $query->joinWith('user');
+                $query->andWhere(['like', 'users.name', addcslashes($this->user_id, '%_')]);
+                */
+                $query->andWhere(['like', 'user_name', addcslashes($this->user_id, '%_')]);
+            }
+        }
+
         $query->andFilterWhere([
             'id' => $this->id,
             'material_type' => $this->material_type,
             'material_id' => $this->material_id,
-            'user_id' => $this->user_id,
             'user_ip' => $this->user_ip,
             'parent_id' => $this->parent_id,
             'language_id' => $this->language_id,
