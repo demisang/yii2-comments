@@ -2,7 +2,7 @@
 // COMMENTS
 // --------
 
-(function ($) {
+;(function ($) {
     "use strict";
 
     $.fn.commentsWidget = function (options) {
