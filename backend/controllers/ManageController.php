@@ -3,6 +3,7 @@
 namespace demi\comments\backend\controllers;
 
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\web\Response;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -66,6 +67,7 @@ class ManageController extends Controller
     public function actionCreate()
     {
         $model = new Comment();
+        $model->setScenario('admin');
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -89,6 +91,7 @@ class ManageController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->setScenario('admin');
 
         if (!$model->canUpdate()) {
             throw new ForbiddenHttpException('You don\'t have permissions to update this comment');
@@ -126,6 +129,15 @@ class ManageController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * Toggle comment moderation status
+     *
+     * @param int $id
+     *
+     * @return array
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
+     */
     public function actionToggleApprove($id)
     {
         $model = $this->findModel($id);
@@ -145,6 +157,27 @@ class ManageController extends Controller
         return [
             'status' => $result ? 'success' : 'error',
         ];
+    }
+
+    /**
+     * Redirect to the page with this comment
+     *
+     * @param int $id
+     *
+     * @return Response
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     */
+    public function actionGoToComment($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($model->component->getPermalink === null) {
+            throw new InvalidConfigException('For this action you must set comments config: ' .
+                'demi\comments\common\components\Comment::$getPermalink (callable. must return a valid redirect url)');
+        }
+
+        return $this->redirect($model->permalink);
     }
 
     /**

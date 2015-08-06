@@ -46,6 +46,7 @@ class CommentSearch extends Comment
     public function search($params)
     {
         $query = Comment::find()->with('user');
+        $alias = $this->tableName();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -75,6 +76,18 @@ class CommentSearch extends Comment
             }
         }
 
+        $dateFilter = $this->created_at;
+        if (!empty($dateFilter) && strpos($dateFilter, 'to') !== false) {
+            // Filter comments create time by date range
+            $range = explode('to', $dateFilter);
+            if (count($range) === 2) {
+                $from = trim($range[0]);
+                $to = trim($range[1]);
+                $query->andWhere("DATE($alias.created_at) >= :fromDate AND DATE($alias.created_at) <= :toDate",
+                    [':fromDate' => $from, ':toDate' => $to]);
+            }
+        }
+
         $query->andFilterWhere([
             'id' => $this->id,
             'material_type' => $this->material_type,
@@ -85,7 +98,6 @@ class CommentSearch extends Comment
             'is_replied' => $this->is_replied,
             'is_approved' => $this->is_approved,
             'is_deleted' => $this->is_deleted,
-            'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
 

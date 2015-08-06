@@ -2,8 +2,10 @@
 
 namespace demi\comments\common\models;
 
+use demi\comments\common\components\CommentQuery;
 use Yii;
 use yii\base\Exception;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
@@ -28,12 +30,14 @@ use yii\db\Expression;
  *
  * RELATIONS
  * @property \common\models\User $user
+ * @property \demi\comments\common\models\Comment $parent
  *
  * GETTERS
  * comment user info
  * @property string|null $userProfileUrl
  * @property string|null $userPhoto
  * @property string|null $username
+ * @property string $permalink
  * comment data
  * @property string $preparedText
  * @property string $fDate
@@ -44,6 +48,16 @@ use yii\db\Expression;
 class Comment extends ActiveRecord
 {
     public $captcha;
+
+    /**
+     * @inheritdoc
+     *
+     * @return CommentQuery|ActiveQuery
+     */
+    public static function find()
+    {
+        return new CommentQuery(get_called_class());
+    }
 
     /**
      * @inheritdoc
@@ -142,6 +156,16 @@ class Comment extends ActiveRecord
         $component = static::getComponent();
 
         return $this->hasOne($component->userModelClass, ['id' => 'user_id']);
+    }
+
+    /**
+     * Parent comment relation
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParent()
+    {
+        return $this->hasOne(get_class($this), ['id' => 'parent_id']);
     }
 
     /**
@@ -321,7 +345,7 @@ class Comment extends ActiveRecord
     {
         $func = static::getComponent()->getCommentText;
 
-        return is_callable($func) ? call_user_func($func, $this) : nl2br(\yii\helpers\Html::encode($this->text));
+        return is_callable($func) ? call_user_func($func, $this) : nl2br(\yii\helpers\Html::encode(trim($this->text)));
     }
 
     /**
@@ -334,6 +358,18 @@ class Comment extends ActiveRecord
         $func = static::getComponent()->getCommentDate;
 
         return is_callable($func) ? call_user_func($func, $this) : Yii::$app->formatter->asDate($this->created_at);
+    }
+
+    /**
+     * Get permanent link for this comment
+     *
+     * @return mixed|string
+     */
+    public function getPermalink()
+    {
+        $func = static::getComponent()->getPermalink;
+
+        return is_callable($func) ? call_user_func($func, $this) : '#comment-' . $this->id;
     }
 
     /**

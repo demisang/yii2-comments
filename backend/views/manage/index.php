@@ -46,6 +46,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'material_id',
                 'filterInputOptions' => ['class' => 'form-control', 'id' => null],
                 'filterOptions' => ['class' => 'col-md-1'],
+                'format' => 'raw',
+                'value' => function ($model) {
+                    /* @var $model Comment */
+
+                    return Html::a('#' . $model->material_type . ' open', ['go-to-comment', 'id' => $model->id], [
+                        'target' => '_blank',
+                        'title' => Yii::t('app', 'Go to comment'),
+                        'data-pjax' => 0,
+                        'class' => 'btn btn-default',
+                    ]);
+                },
                 // 'prepend' => '<span class="glyphicon glyphicon-chevron-right"></span>',
             ],
             [
@@ -79,12 +90,24 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'user_email',
                 'format' => 'email',
                 'prepend' => '<span class="glyphicon glyphicon-envelope form-control-feedback" aria-hidden="true"></span>',
-
             ],
             [
                 'attribute' => 'created_at',
                 'format' => 'datetime',
                 'prepend' => '<span class="glyphicon glyphicon-calendar form-control-feedback" aria-hidden="true"></span>',
+                'filter' => '<div class="input-group drp-container">' .
+                    \kartik\daterange\DateRangePicker::widget([
+                        'model' => $searchModel,
+                        'attribute' => 'created_at',
+                        'convertFormat' => true,
+                        'useWithAddon' => true,
+                        'pluginOptions' => [
+                            'format' => 'Y-m-d',
+                            'separator' => ' to ',
+                            'opens' => 'left',
+                        ],
+                    ]) .
+                    '</div>',
             ],
             [
                 'class' => 'demi\comments\backend\components\ActionColumn',

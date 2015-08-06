@@ -81,6 +81,13 @@ class Comment extends Component
      * @var null|callable
      */
     public $getCommentDate;
+    /**
+     * Anonymous function to get comment permalink.
+     * Primary used only in backend for action "goToComment", not for frontend.
+     *
+     * @var null|callable
+     */
+    public $getPermalink;
     /** @var string Path to view file for render comments list (<ul> and <li> tags + nested) */
     public $listView = '@vendor/demi/comments/frontend/widgets/views/comments';
     /** @var string Path to view file for render each comment item (inside the <li> tag) */

@@ -100,7 +100,11 @@ class Comments extends Widget
             $model = $this->component->getModel();
             $alias = $model->tableName();
             $this->_comments = $model->find()
-                ->where(['material_type' => $this->materialType, 'material_id' => $this->materialId])
+                ->where([
+                    'material_type' => $this->materialType,
+                    'material_id' => $this->materialId,
+                    'is_deleted' => 0,
+                ])
                 ->orderBy(["$alias.parent_id" => SORT_ASC, "$alias.created_at" => SORT_ASC])
                 ->with(['user'])
                 ->all();

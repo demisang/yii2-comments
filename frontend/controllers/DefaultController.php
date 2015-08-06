@@ -140,7 +140,9 @@ class DefaultController extends Controller
             throw new ForbiddenHttpException('You are not allowed to perform this action');
         }
 
-        $status = (bool)$model->delete();
+        $model->is_deleted = 1;
+
+        $status = $model->save(false, ['is_deleted']);
 
         Yii::$app->response->format = Response::FORMAT_JSON;
 
