@@ -50,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function ($model) {
                     /* @var $model Comment */
 
-                    return Html::a('#' . $model->material_type . ' open', ['go-to-comment', 'id' => $model->id], [
+                    return Html::a('#' . $model->material_id . ' open', ['go-to-comment', 'id' => $model->id], [
                         'target' => '_blank',
                         'title' => Yii::t('app', 'Go to comment'),
                         'data-pjax' => 0,
