@@ -1,6 +1,7 @@
 Yii2-comments
 ===================
-Yii2 module for comments management
+Yii2 module for comments management<br>
+[Live frontend demo](https://orlov.io/articles/podrobno-o-renderpartial-v-yii#comments)
 
 Installation
 ---
