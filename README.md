@@ -45,6 +45,8 @@ return [
         1 => 'Publication',
         2 => 'Product',
     ],
+    // User model class name (by default "common\models\User")
+    'userModelClass' => 'common\models\User',
     // Anonymous function to get user display name
     'getUsername' => function (Comment $comment) {
         // By default anon comment user name
