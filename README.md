@@ -216,6 +216,7 @@ For example, you wish add comments to model "Publication", so append publication
     'materialViewUrl' => Url::to(['view', 'id' => $model->id]),
     // ActiveForm configuration
     'formConfig' => [
+        // This is required config attributes, you should save it
         'enableClientValidation' => true,
         'enableAjaxValidation' => false,
     ],
