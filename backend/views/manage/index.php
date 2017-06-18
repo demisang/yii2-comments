@@ -102,8 +102,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         'convertFormat' => true,
                         'useWithAddon' => true,
                         'pluginOptions' => [
-                            'format' => 'Y-m-d',
-                            'separator' => ' to ',
+                            'locale' => [
+                                'format' => 'Y-m-d',
+                                'separator' => ' - ',
+                            ],
+                            'autoApply' => true,
                             'opens' => 'left',
                         ],
                     ]) .

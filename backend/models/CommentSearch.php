@@ -77,9 +77,9 @@ class CommentSearch extends Comment
         }
 
         $dateFilter = $this->created_at;
-        if (!empty($dateFilter) && strpos($dateFilter, 'to') !== false) {
+        if (!empty($dateFilter) && strpos($dateFilter, ' - ') !== false) {
             // Filter comments create time by date range
-            $range = explode('to', $dateFilter);
+            $range = explode(' - ', $dateFilter);
             if (count($range) === 2) {
                 $from = trim($range[0]);
                 $to = trim($range[1]);
