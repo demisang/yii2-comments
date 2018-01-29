@@ -1,13 +1,18 @@
 <?php
+/**
+ * @copyright Copyright (c) 2018 Ivan Orlov
+ * @license   https://github.com/demisang/yii2-comments/blob/master/LICENSE
+ * @link      https://github.com/demisang/yii2-comments#readme
+ * @author    Ivan Orlov <gnasimed@gmail.com>
+ */
 
 namespace demi\comments\common\models;
 
-use demi\comments\common\components\CommentQuery;
 use Yii;
-use yii\base\Exception;
+use yii\db\Expression;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\db\Expression;
+use demi\comments\common\components\CommentQuery;
 
 /**
  * This is the model class for table "comments".
@@ -29,21 +34,21 @@ use yii\db\Expression;
  * @property string $updated_at
  *
  * RELATIONS
- * @property \common\models\User $user
- * @property \demi\comments\common\models\Comment $parent
+ * @property-read \common\models\User $user
+ * @property-read \demi\comments\common\models\Comment $parent
  *
  * GETTERS
  * comment user info
- * @property string|null $userProfileUrl
- * @property string|null $userPhoto
- * @property string|null $username
- * @property string $permalink
+ * @property-read string|null $userProfileUrl
+ * @property-read string|null $userPhoto
+ * @property-read string|null $username
+ * @property-read string $permalink
  * comment data
- * @property string $preparedText
- * @property string $fDate
- * @property bool $isAnonymous
+ * @property-read string $preparedText
+ * @property-read string $fDate
+ * @property-read bool $isAnonymous
  * others
- * @property \demi\comments\common\components\Comment $component
+ * @property-read \demi\comments\common\components\Comment $component
  */
 class Comment extends ActiveRecord
 {

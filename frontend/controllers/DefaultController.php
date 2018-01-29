@@ -1,4 +1,10 @@
 <?php
+/**
+ * @copyright Copyright (c) 2018 Ivan Orlov
+ * @license   https://github.com/demisang/yii2-comments/blob/master/LICENSE
+ * @link      https://github.com/demisang/yii2-comments#readme
+ * @author    Ivan Orlov <gnasimed@gmail.com>
+ */
 
 namespace demi\comments\frontend\controllers;
 
@@ -10,7 +16,6 @@ use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use demi\comments\common\models\Comment;
 use yii\web\Response;
-use yii\widgets\ActiveForm;
 
 /**
  * Class DefaultController

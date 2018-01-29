@@ -1,4 +1,10 @@
 <?php
+/**
+ * @copyright Copyright (c) 2018 Ivan Orlov
+ * @license   https://github.com/demisang/yii2-comments/blob/master/LICENSE
+ * @link      https://github.com/demisang/yii2-comments#readme
+ * @author    Ivan Orlov <gnasimed@gmail.com>
+ */
 
 namespace demi\comments\common\components;
 
@@ -7,8 +13,7 @@ use yii\base\Component;
 use yii\base\Exception;
 
 /**
- * Class Comment
- * @package demi\comments\common\components
+ * Comments component
  *
  * @property \demi\comments\common\models\Comment $model
  */

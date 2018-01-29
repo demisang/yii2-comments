@@ -1,6 +1,11 @@
 <?php
+/**
+ * @copyright Copyright (c) 2018 Ivan Orlov
+ * @license   https://github.com/demisang/yii2-comments/blob/master/LICENSE
+ * @link      https://github.com/demisang/yii2-comments#readme
+ * @author    Ivan Orlov <gnasimed@gmail.com>
+ */
 
-use yii\helpers\Url;
 use yii\web\View;
 use yii\helpers\Html;
 use demi\comments\common\models\Comment;

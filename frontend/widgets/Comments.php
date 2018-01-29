@@ -1,4 +1,10 @@
 <?php
+/**
+ * @copyright Copyright (c) 2018 Ivan Orlov
+ * @license   https://github.com/demisang/yii2-comments/blob/master/LICENSE
+ * @link      https://github.com/demisang/yii2-comments#readme
+ * @author    Ivan Orlov <gnasimed@gmail.com>
+ */
 
 namespace demi\comments\frontend\widgets;
 
@@ -7,7 +13,6 @@ use yii\base\Exception;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
-use yii\web\JsExpression;
 
 /**
  * Class Comments
@@ -162,4 +167,4 @@ class Comments extends Widget
         // Register plugin
         $view->registerJs("jQuery('#$id').commentsWidget($options);");
     }
-} 
+}
