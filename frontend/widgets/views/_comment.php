@@ -48,6 +48,11 @@ $profileLink = $userProfileUrl ? Html::a($username, $userProfileUrl, ['class' =>
     <?php endif ?>
     <div class="comment-body">
         <div class="comment-username"><?= $profileLink ?></div>
+        <div class="comment-info">
+            <time class="dt-published" datetime="<?= $comment->created_at ?>"><?= $comment->fDate ?></time>
+            <?= Html::a('#', '#comment-' . $cid, ['class' => 'u-url']) ?>
+        </div>
+
         <div class="comment-text e-content">
             <p><?= $comment->getPreparedText() ?></p>
         </div>
@@ -64,8 +69,6 @@ $profileLink = $userProfileUrl ? Html::a($username, $userProfileUrl, ['class' =>
                 <?php endif ?>
 
             </div>
-            <time class="dt-published" datetime="<?= $comment->created_at ?>"><?= $comment->fDate ?></time>
-            <?= Html::a('#', '#comment-' . $cid, ['class' => 'u-url']) ?>
         </div>
     </div>
 </article>

@@ -1,0 +1,31 @@
+/* Example comments-tree styles */
+
+ul.comments > li > ul {
+    margin-left: 70px;
+}
+
+ul.comments .comment {
+    margin-bottom: 20px;
+}
+
+ul.comments .comment .comment-user-photo {
+    float: left;
+}
+
+ul.comments .comment .comment-user-photo img {
+    width: 70px;
+}
+
+ul.comments .comment .comment-username {
+    float: left;
+    font-weight: bold;
+    padding-right: 10px;
+}
+
+ul.comments .comment .comment-body {
+    padding-left: 80px;
+}
+
+ul.comments .comment .comment-body .comment-text {
+    margin-top: 3px;
+}

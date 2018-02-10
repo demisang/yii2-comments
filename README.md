@@ -7,14 +7,14 @@ Installation
 ---
 Run
 ```code
-composer require require "demi/comments" "~1.0"
+composer require "demi/comments" "~1.0"
 ```
 
 # Configurations
 ---
 Create `comments` table:
 ```code
-yii migrate --migrationPath=@vendor/demi/comments/console/migrations
+./yii migrate --migrationPath=@vendor/demi/comments/console/migrations
 ```
 Create config file: `/common/config/comments.php`
 ```php
@@ -111,8 +111,7 @@ return [
         return Yii::$app->params['reCAPTCHA.secretKey'];
     },
 
-    // FOR FIRST RECOMMENDED USE DEFAULT VIEW FILES ADAPTED FOR BOOTSTRAP TEMPLATE,
-    // CUSTOMIZE IT AFTER TESTING, SO PLEASE UNCOMMENT 'listView', 'itemView' and 'formView' LATER
+    // FOR FIRST RECOMMENDED USE DEFAULT VIEW FILES WITH EXAMPLE CSS STYLES, CUSTOMIZE TEMPLATES AFTER TESTING
 
     // But after checking extension is working you can customize view templates, useful bash copy commands in project root dir:
     /*
@@ -123,7 +122,7 @@ return [
     */
     // ALSO: WHILE CUSTOMIZING YOU SHOULD SAVE SOME HTML CLASS SELECTORS!
     // SEE ALL SELECTORS HERE: vendor/demi/comments/frontend/widgets/assets/js/comments.js:61
-    // OR YOU CAN SPECIFY YOU NEW SELECTORS FOR WIDGET CONFIG 'clientOptions': \demi\comments\frontend\widgets\Comments::$clientOptions
+    // OR YOU CAN SET YOUR CUSTOM SELECTORS FOR WIDGET CONFIG 'clientOptions': \demi\comments\frontend\widgets\Comments::$clientOptions
 
     // Path to view file for render comments list (<ul> and <li> tags + nested)
 //    'listView' => '@frontend/views/comment/myCustomCommentsListView',
@@ -151,10 +150,23 @@ return [
             'class' => 'demi\comments\frontend\CommentModule',
         ],
     ],
+    'components' => [
+        'assetManager' => [
+            'bundles' => [
+                // Extend default CommentsAsset: attaching included example css-styles for comments tree.
+                // After testing you can remove this lines and make own css-styles you want.
+                'demi\comments\frontend\widgets\CommentsAsset' => [
+                    'css' => [
+                        'css/comments.css',
+                    ],
+                ],
+            ],
+        ],
+    ],
 ];
 ```
 
-Configure backend module `/backend/config/main.php`:
+Configure backend `/backend/config/main.php`:
 ```php
 return [
     'modules' => [
